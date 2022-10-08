@@ -1,0 +1,14 @@
+def on_message(client, userdata, message,tmp=None):
+    print(" Received message " + str(message.payload)
+        + " on topic '" + message.topic
+        + "' with QoS " + str(message.qos))
+
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code "+str(rc))
+
+    # Subscribing in on_connect() means that if we lose the connection and
+    # reconnect then subscriptions will be renewed.
+    client.subscribe("$SYS/#")
+
+def on_publish(client,userdata,message_id):
+    pass
