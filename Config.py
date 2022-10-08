@@ -1,0 +1,1 @@
+CONSUMO_DELAY = 10
