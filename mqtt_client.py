@@ -1,8 +1,8 @@
 import paho.mqtt.client as mqtt
 import mycallbacks
 
-def Client():
-    client = mqtt.Client(client_id="teste")
+def Client(id):
+    client = mqtt.Client(client_id=str(id))
     #client.username_pw_set()
     client.on_message = mycallbacks.on_message
     client.on_connect = mycallbacks.on_connect
@@ -16,6 +16,12 @@ def Client_Connect(client,broker,port):
 def Publish(client,topic,message):
     return client.publish(topic,message)
 
+def Subscribe(client,topic):
+    client.subscribe(topic)
+    return client
+
 if __name__ == "__main__":
     cliente = Client()
-    Client_Connect(cliente,"localhost",500)
+    Client_Connect(cliente,"localhost",1883)
+    Publish(cliente,"$SYS/","teste")
+    print("rodou")
