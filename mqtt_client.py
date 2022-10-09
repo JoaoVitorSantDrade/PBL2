@@ -1,5 +1,6 @@
 import paho.mqtt.client as mqtt
 import mycallbacks
+import paho.mqtt.publish as publish
 
 def Client(id):
     client = mqtt.Client(client_id=str(id))
@@ -19,6 +20,8 @@ def Publish(client,topic,message):
 def Subscribe(client,topic):
     client.subscribe(topic)
     return client
+def Multiple(client_id,host,port,msg):
+    publish.multiple(msg, hostname=host,port=port,client_id=client_id)
 
 if __name__ == "__main__":
     cliente = Client()

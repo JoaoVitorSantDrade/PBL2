@@ -8,7 +8,6 @@ import time
 import os
 import json
 from time import localtime, strftime
-import paho.mqtt.publish as publish
 
 class Hidrometro:
     
@@ -34,6 +33,8 @@ class Hidrometro:
 
             lista = hidrometro_conectado._getvalue()
             Json = json.loads(lista[0])
+
+            #pega os dados e envia p/ broker
             msgs = [("nevoa_test/hidrometro/"+self.hidrante.id+"/consumo",Json["consumo"],0,False),
                     ("nevoa_test/hidrometro/"+self.hidrante.id+"/vazao",Json["vazao"],0,False),
                     ("nevoa_test/hidrometro/"+self.hidrante.id+"/vazamento",Json["vazamento"],0,False),
@@ -41,8 +42,7 @@ class Hidrometro:
                     ("nevoa_test/hidrometro/"+self.hidrante.id+"/vazamento_valor",Json["vazamento_valor"],0,False),
                     ("nevoa_test/hidrometro/"+self.hidrante.id+"/delay",Json["delay"],0,False)]
 
-            publish.multiple()
-            mqtt_client.Publish()
+            mqtt_client.Multiple(self.hidrante.id,host_to_connect,port_to_connect,msgs)
 
 
             self.hidrante.vazamento_valor = Json["vazamento_valor"]
