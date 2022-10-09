@@ -20,6 +20,7 @@ def Publish(client,topic,message):
 def Subscribe(client,topic):
     client.subscribe(topic)
     return client
+    
 def Multiple(client_id,host,port,msg):
     publish.multiple(msg, hostname=host,port=port,client_id=client_id)
 

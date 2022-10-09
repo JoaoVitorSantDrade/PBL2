@@ -15,7 +15,7 @@ class Hidrometro:
         self.hidrante = hidrante
         self.clientMQTT = mqtt_client.Client(hidrante.id)
     
-    def HidrometroClient(self,host_to_connect,port_to_connect,hidrometro_conectado): #Envia os dados para o servidor (Nuvem)
+    def HidrometroClient(self,host_to_connect,port_to_connect): #Envia os dados para o servidor (Nuvem)
         while True: 
             print("Conexão iniciada")
             if(self.hidrante.fechado == False):
@@ -30,17 +30,14 @@ class Hidrometro:
             print("Conexão finalzada!")
             
             #Pesca p/ topicos "mynevoaid/hidrometro/id_hidrometro/#"
-
-            lista = hidrometro_conectado._getvalue()
-            Json = json.loads(lista[0])
-
+            hid_id = str(self.hidrante.id)
             #pega os dados e envia p/ broker
-            msgs = [("nevoa_test/hidrometro/"+self.hidrante.id+"/consumo",Json["consumo"],0,False),
-                    ("nevoa_test/hidrometro/"+self.hidrante.id+"/vazao",Json["vazao"],0,False),
-                    ("nevoa_test/hidrometro/"+self.hidrante.id+"/vazamento",Json["vazamento"],0,False),
-                    ("nevoa_test/hidrometro/"+self.hidrante.id+"/fechado",Json["fechado"],0,False),
-                    ("nevoa_test/hidrometro/"+self.hidrante.id+"/vazamento_valor",Json["vazamento_valor"],0,False),
-                    ("nevoa_test/hidrometro/"+self.hidrante.id+"/delay",Json["delay"],0,False)]
+            msgs = [("nevoa_test/hidrometro/"+hid_id+"/consumo",str(self.hidrante.consumo),0,False),
+                    ("nevoa_test/hidrometro/"+hid_id+"/vazao",str(self.hidrante.vazao),0,False),
+                    ("nevoa_test/hidrometro/"+hid_id+"/vazamento",str(self.hidrante.vazamento),0,False),
+                    ("nevoa_test/hidrometro/"+hid_id+"/fechado",str(self.hidrante.fechado),0,False),
+                    ("nevoa_test/hidrometro/"+hid_id+"/vazamento_valor",str(self.hidrante.vazamento_valor),0,False),
+                    ("nevoa_test/hidrometro/"+hid_id+"/delay",str(self.hidrante.delay),0,False)]
 
             mqtt_client.Multiple(self.hidrante.id,host_to_connect,port_to_connect,msgs)
 
@@ -68,17 +65,14 @@ def main():
 
     print("O seu ID é: %s\n" % (str(hidro.id)))
 
-    with Manager() as manager:
-        try:
-            hidrometro_conectado = manager.dict()
-            hidrometro_conectado[0] = hidrometro.hidrante.getDadoJSON()
-            server_process = Process(target=hidrometro.HidrometroClient, args=(connect_host,connect_port,hidrometro_conectado,))
-            server_process.start()
-        except KeyboardInterrupt:
-            print("Fechando os processos")   
-        finally:
-            server_process.join()
-            print("Fechando o programa")   
+    try:
+        server_process = Process(target=hidrometro.HidrometroClient, args=(connect_host,connect_port,))
+        server_process.start()
+    except KeyboardInterrupt:
+        print("Fechando os processos")   
+    finally:
+        server_process.join()
+        print("Fechando o programa")   
 
 
 if __name__ == '__main__':
