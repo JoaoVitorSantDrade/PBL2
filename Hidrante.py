@@ -8,8 +8,6 @@ import time
 class Hidrante:
     
     def __init__(self,consumo,vazao,vazamento,vazamento_valor,fechado,delay):
-        self.mes = 9
-        self.ano = 2022
         self.consumo = consumo
         self.vazao = vazao
         self.vazamento = vazamento
