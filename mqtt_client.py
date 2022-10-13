@@ -25,7 +25,7 @@ def Multiple(client_id,host,port,msg):
     publish.multiple(msg, hostname=host,port=port,client_id=client_id)
 
 if __name__ == "__main__":
-    cliente = Client()
+    cliente = Client(5)
     Client_Connect(cliente,"localhost",1883)
-    Publish(cliente,"$SYS/","teste")
+    Publish(cliente,"temperatura/test","teste")
     print("rodou")
