@@ -15,6 +15,7 @@ def Client_Connect(client,broker,port):
     client.loop_start()
 
 def Publish(client,topic,message):
+    client.publish("IDENTIFIER/" + client.id,"1")
     return client.publish(topic,message)
 
 def Subscribe(client,topic):
