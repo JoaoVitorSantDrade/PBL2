@@ -13,5 +13,4 @@ TEST_MESSAGE = "Testando o envio de strings"
 DELAY = 2
 CONSUMO_DELAY = 10
 TICKS_TO_GENERATE_PAYMENT = (30 / DELAY)
-TOPIC_HIDROMETRO = "mynevoaid/hidrometro/id_hidrometro/#"
-HIDROMETROS_ID = "IDENTIFIER/#"
+
