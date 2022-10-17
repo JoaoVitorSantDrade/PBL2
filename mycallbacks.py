@@ -10,5 +10,5 @@ def on_connect(client, userdata, flags, rc):
     # reconnect then subscriptions will be renewed.
     client.subscribe("$SYS/#")
 
-def on_publish(client,userdata,message_id):
-    pass
+def on_publish(client,userdata,mid):
+    print(mid)
