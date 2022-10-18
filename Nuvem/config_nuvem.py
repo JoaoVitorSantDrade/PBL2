@@ -1,0 +1,1 @@
+dados_nevoa = {"id","media_consumo","total_hidrometros"}

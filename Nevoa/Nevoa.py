@@ -8,7 +8,7 @@ lista_clients_conectados = []
 lista_clients = {}
 
 # Quando uma nova conexão é feita com o brocker
-def on_connect_nevoa(client, userdata, flags, rc):
+def on_connect_nuvem(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
 
     # Subscribing in on_connect() means that if we lose the connection and
@@ -26,6 +26,7 @@ def on_message_nevoa(client,userdata,message,tmp=None):
     topico = message.topic
     msg = message.payload
     # salvar valor no client especifico
+    lista_clients[id_client]= msg 
 
 # Quando é feita uma publicação no topico de ids de hidrometros
 # Insere o id na Lista

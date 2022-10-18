@@ -1,9 +1,10 @@
 import paho.mqtt.client as mqtt
 import mycallbacks
 import paho.mqtt.publish as publish
+import config_nuvem
 
-# Lista dos ids de nevoas conectadas
-lista_nevoas_conectadas = []
+# Lista das médias de nevoas conectadas
+media_nevoas_conectadas = []
 
 # Quando uma nova conexão é feita com o brocker
 def on_connect_nevoa(client, userdata, flags, rc):
@@ -20,9 +21,10 @@ def on_message_nevoa(client,userdata,message,tmp=None):
     topico = message.topic
     msg = message.payload
     # salvar valor no client especifico
+    media_nevoas_conectadas[id_client][topico] =msg
 
 # Quando uma nova publicação é feita pela Nuvem no brocker
-def on_publish_nevoa(client,userdata,mid):
+def on_publish_nuvem(client,userdata,mid):
     print(mid)
 
 # Cria instância de cliente para observar topico de plubicação de dados
