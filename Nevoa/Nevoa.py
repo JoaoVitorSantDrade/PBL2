@@ -7,6 +7,8 @@ lista_clients_conectados = []
 # Dicionario com dados do clientes conectados
 lista_clients = {}
 
+lista_consumo_clients = {}
+
 # Quando uma nova conexão é feita com o brocker
 def on_connect_nuvem(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
@@ -26,6 +28,21 @@ def on_message_nevoa(client,userdata,message,tmp=None):
     topico = message.topic
     msg = message.payload
     # salvar valor no client especifico
+    if topico == "hidrometro/"+id_client+"/consumo":
+        consumo = int(msg)
+        lista_consumo_clients[id_client] = consumo
+        pass
+    elif topico == "hidrometro/"+id_client+"/vazao":
+        pass
+    elif topico == "hidrometro/"+id_client+"/vazamento":
+        pass
+    elif topico == "hidrometro/"+id_client+"/fechado":
+        pass
+    elif topico == "hidrometro/"+id_client+"/vazamento_valor":
+        pass
+    elif topico == "hidrometro/"+id_client+"/delay":
+        pass
+
     lista_clients[id_client]= msg 
 
 # Quando é feita uma publicação no topico de ids de hidrometros
@@ -40,7 +57,8 @@ def sub_to_getClients(client):
 
 
 def sub_to_getValues(client):
-    client.subscribe("hidrometros/"+client.id+"/#")
+    client.subscribe("hidrometros/"+client.id+"/#") # se inscreve no topico da sua nevoa
+    # para receber valores dos seus hidromeros
 
 
 # Cria instância de cliente para observar ids dos hidrometros

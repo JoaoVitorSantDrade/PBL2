@@ -35,12 +35,12 @@ class Hidrometro:
             #Pesca p/ topicos "mynevoaid/hidrometro/id_hidrometro/#"
             hid_id = str(self.hidrante.id)
             #pega os dados e envia p/ broker
-            msgs = [("nevoa_test/hidrometro/"+hid_id+"/consumo",str(self.hidrante.consumo),0,False),
-                    ("nevoa_test/hidrometro/"+hid_id+"/vazao",str(self.hidrante.vazao),0,False),
-                    ("nevoa_test/hidrometro/"+hid_id+"/vazamento",str(self.hidrante.vazamento),0,False),
-                    ("nevoa_test/hidrometro/"+hid_id+"/fechado",str(self.hidrante.fechado),0,False),
-                    ("nevoa_test/hidrometro/"+hid_id+"/vazamento_valor",str(self.hidrante.vazamento_valor),0,False),
-                    ("nevoa_test/hidrometro/"+hid_id+"/delay",str(self.hidrante.delay),0,False)]
+            msgs = [("hidrometro/"+hid_id+"/consumo",str(self.hidrante.consumo),0,False),
+                    ("hidrometro/"+hid_id+"/vazao",str(self.hidrante.vazao),0,False),
+                    ("hidrometro/"+hid_id+"/vazamento",str(self.hidrante.vazamento),0,False),
+                    ("hidrometro/"+hid_id+"/fechado",str(self.hidrante.fechado),0,False),
+                    ("hidrometro/"+hid_id+"/vazamento_valor",str(self.hidrante.vazamento_valor),0,False),
+                    ("hidrometro/"+hid_id+"/delay",str(self.hidrante.delay),0,False)]
 
             mqtt_client.Multiple(self.hidrante.id,host_to_connect,port_to_connect,msgs)
 
