@@ -7,7 +7,7 @@ import time
 
 class Hidrante:
     
-    def __init__(self,consumo,vazamento,vazamento_valor,fechado,delay):
+    def __init__(self,consumo,vazamento,vazamento_valor,fechado,tendencia,delay):
         self.mes = 9
         self.ano = 2022
         self.consumo = consumo
@@ -18,6 +18,7 @@ class Hidrante:
         seed(time.time())
         self.id = randint(0,100000)
         self.vazao = randint(1,10) + randint(0,9) * 0.1 #obtém um valor aleatorio para vazao definida
+        self.tendencia = tendencia
 
     def ContabilizarConsumo(self): #Contabiliza o consumo do hidrometro
             #Contabiliza o consumo baseado na tendencia

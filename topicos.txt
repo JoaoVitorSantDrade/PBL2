@@ -1,0 +1,8 @@
+hidrometro/#
+hidrometro/id
+hidrometro/id/consumo
+hidrometro/id/vazao
+hidrometro/id/vazamento
+hidrometro/id/vazamento_valor
+hidrometro/id/delay
+hidrometro/id/fechado

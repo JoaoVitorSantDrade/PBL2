@@ -11,7 +11,7 @@ from time import localtime, strftime
 
 class Hidrometro:
     
-    def __init__(self,hidrante,host,port):   
+    def __init__(self,hidrante):   
         self.hidrante = hidrante
         self.clientMQTT = mqtt_client.Client(hidrante.id)
 
@@ -35,15 +35,15 @@ class Hidrometro:
             #Pesca p/ topicos "mynevoaid/hidrometro/id_hidrometro/#"
             hid_id = str(self.hidrante.id)
             #pega os dados e envia p/ broker
-            msgs = [("hidrometro/"+hid_id+"/consumo",str(self.hidrante.consumo),0,False),
-                    ("hidrometro/"+hid_id+"/vazao",str(self.hidrante.vazao),0,False),
-                    ("hidrometro/"+hid_id+"/vazamento",str(self.hidrante.vazamento),0,False),
-                    ("hidrometro/"+hid_id+"/fechado",str(self.hidrante.fechado),0,False),
-                    ("hidrometro/"+hid_id+"/vazamento_valor",str(self.hidrante.vazamento_valor),0,False),
-                    ("hidrometro/"+hid_id+"/delay",str(self.hidrante.delay),0,False)]
+            #msgs = [("hidrometro/"+hid_id+"/consumo",str(self.hidrante.consumo),0,False),
+                    #("hidrometro/"+hid_id+"/vazao",str(self.hidrante.vazao),0,False),
+                    #("hidrometro/"+hid_id+"/vazamento",str(self.hidrante.vazamento),0,False),
+                    #("hidrometro/"+hid_id+"/fechado",str(self.hidrante.fechado),0,False),
+                    #("hidrometro/"+hid_id+"/vazamento_valor",str(self.hidrante.vazamento_valor),0,False),
+                    #("hidrometro/"+hid_id+"/delay",str(self.hidrante.delay),0,False)]
 
-            mqtt_client.Multiple(self.hidrante.id,host_to_connect,port_to_connect,msgs)
-
+            #mqtt_client.Multiple(self.hidrante.id,host_to_connect,port_to_connect,msgs)
+            mqtt_client.Publish(self.clientMQTT,"hidrometro/vazao",str(self.hidrante.vazao))
             print("Consumo Atual: %s | Vazão Atual: %s | Vazamento Atual: %s | Fechado: %s" % (str(self.hidrante.consumo),str(self.hidrante.vazao),str(self.hidrante.vazamento_valor),str(self.hidrante.fechado)))
             time.sleep(self.hidrante.delay)
 
@@ -54,18 +54,18 @@ def main():
 
     os.system('cls' if os.name == 'nt' else 'clear')
 
-    hidro = Hidrante.Hidrante(0,0,False,0.0,True,4)
+    hidro = Hidrante.Hidrante(0,False,0,False,1,10)
 
-    hidrometro = Hidrometro(hidro)
+    hidrometro = Hidrometro(hidro) #ip do broker, porta do brocker
 
     print("O seu ID é: %s\n" % (str(hidro.id)))
 
-    hidrometro.clientMQTT.subscribe("nevoa_test/hidrometro/"+str(hidrometro.hidrante.id)+"/consumo")
-    hidrometro.clientMQTT.subscribe("nevoa_test/hidrometro/"+str(hidrometro.hidrante.id)+"/vazao")
-    hidrometro.clientMQTT.subscribe("nevoa_test/hidrometro/"+str(hidrometro.hidrante.id)+"/vazamento")
-    hidrometro.clientMQTT.subscribe("nevoa_test/hidrometro/"+str(hidrometro.hidrante.id)+"/fechado")
-    hidrometro.clientMQTT.subscribe("nevoa_test/hidrometro/"+str(hidrometro.hidrante.id)+"/vazamento_valor")
-    hidrometro.clientMQTT.subscribe("nevoa_test/hidrometro/"+str(hidrometro.hidrante.id)+"/delay")
+    #hidrometro.clientMQTT.subscribe("nevoa_test/hidrometro/"+str(hidrometro.hidrante.id)+"/consumo")
+    #hidrometro.clientMQTT.subscribe("nevoa_test/hidrometro/"+str(hidrometro.hidrante.id)+"/vazao")
+    #hidrometro.clientMQTT.subscribe("nevoa_test/hidrometro/"+str(hidrometro.hidrante.id)+"/vazamento")
+    #hidrometro.clientMQTT.subscribe("nevoa_test/hidrometro/"+str(hidrometro.hidrante.id)+"/fechado")
+    #hidrometro.clientMQTT.subscribe("nevoa_test/hidrometro/"+str(hidrometro.hidrante.id)+"/vazamento_valor")
+    #hidrometro.clientMQTT.subscribe("nevoa_test/hidrometro/"+str(hidrometro.hidrante.id)+"/delay")
 
     try:
         server_process = Process(target=hidrometro.HidrometroClient, args=(connect_host,connect_port,))

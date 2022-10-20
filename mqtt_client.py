@@ -10,12 +10,12 @@ def Client(id):
     client.on_publish = mycallbacks.on_publish
     return client
 
-def Client_Connect(client,broker,port):
-    client.connect(broker,port=port,keepalive=60)
+def Client_Connect(client,host,port):
+    client.connect(host,port=port,keepalive=60)
     client.loop_start()
 
 def Publish(client,topic,message):
-    client.publish("IDENTIFIER/" + client.id,"1")
+    client.publish("IDENTIFIER/" + str(client._client_id),"1")
     return client.publish(topic,message)
 
 def Subscribe(client,topic):
