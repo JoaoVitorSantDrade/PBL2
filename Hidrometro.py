@@ -14,6 +14,8 @@ class Hidrometro:
     def __init__(self,hidrante):   
         self.hidrante = hidrante
         self.clientMQTT = mqtt_client.Client(hidrante.id)
+        mqtt_client.Subscribe(self.clientMQTT,"hidrometro/"+str(self.hidrante.id)+"/fechado/tipo")
+        mqtt_client.Subscribe(self.clientMQTT,"hidrometro/"+str(self.hidrante.id)+"/delay")
 
     def HidrometroServerMQTT():
         pass
@@ -43,7 +45,13 @@ class Hidrometro:
                     #("hidrometro/"+hid_id+"/delay",str(self.hidrante.delay),0,False)]
 
             #mqtt_client.Multiple(self.hidrante.id,host_to_connect,port_to_connect,msgs)
-            mqtt_client.Publish(self.clientMQTT,"hidrometro/vazao",str(self.hidrante.vazao))
+            mqtt_client.Publish(self.clientMQTT,"hidrometro/"+ str(self.hidrante.id)+ "/vazao",str(self.hidrante.vazao)+"-Vazao")
+            mqtt_client.Publish(self.clientMQTT,"hidrometro/"+ str(self.hidrante.id)+ "/consumo",str(self.hidrante.consumo)+"-consumo")
+            mqtt_client.Publish(self.clientMQTT,"hidrometro/"+ str(self.hidrante.id)+ "/vazamento",str(self.hidrante.vazamento)+"-vazamento")
+            mqtt_client.Publish(self.clientMQTT,"hidrometro/"+ str(self.hidrante.id)+ "/fechado",str(self.hidrante.fechado)+"bloqueado")
+            #mqtt_client.Publish(self.clientMQTT,"hidrometro/"+ str(self.hidrante.id)+ "/fechado/tipo","0"+"-tipo")
+            mqtt_client.Publish(self.clientMQTT,"hidrometro/"+ str(self.hidrante.id)+ "/vazamento_valor",str(self.hidrante.vazamento_valor)+"-vazamento valor")
+            mqtt_client.Publish(self.clientMQTT,"hidrometro/"+ str(self.hidrante.id)+ "/delay",str(self.hidrante.delay)+"-delay")
             print("Consumo Atual: %s | Vazão Atual: %s | Vazamento Atual: %s | Fechado: %s" % (str(self.hidrante.consumo),str(self.hidrante.vazao),str(self.hidrante.vazamento_valor),str(self.hidrante.fechado)))
             time.sleep(self.hidrante.delay)
 
