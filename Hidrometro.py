@@ -1,5 +1,6 @@
 from shutil import ExecError
 from threading import local
+from turtle import delay
 import Hidrante
 import mqtt_client
 import Config
@@ -11,15 +12,20 @@ from time import localtime, strftime
 
 class Hidrometro:
     
-    def __init__(self,hidrante):   
-        self.hidrante = hidrante
+    def __init__(self,hidrante):  
+        #Cria objeto hidrante 
+        self.hidrante = hidrante 
+
+        #cria cliente mqqt para publicação de dados   
         self.clientMQTT = mqtt_client.Client(hidrante.id)
-        mqtt_client.Subscribe(self.clientMQTT,"hidrometro/"+str(self.hidrante.id)+"/fechado/tipo")
-        mqtt_client.Subscribe(self.clientMQTT,"hidrometro/"+str(self.hidrante.id)+"/delay")
+        
+        #cria cliente mqqt para receber dados
+        self.clientMQTTSub = mqtt_client.Client(hidrante.id)
 
     def HidrometroServerMQTT():
         pass
     
+    # método que executa a publicação de dados
     def HidrometroClient(self,host_to_connect,port_to_connect): #Envia os dados para o servidor (Nuvem)
         while True: 
             print("Conexão iniciada")
@@ -54,6 +60,20 @@ class Hidrometro:
             mqtt_client.Publish(self.clientMQTT,"hidrometro/"+ str(self.hidrante.id)+ "/delay",str(self.hidrante.delay)+"-delay")
             print("Consumo Atual: %s | Vazão Atual: %s | Vazamento Atual: %s | Fechado: %s" % (str(self.hidrante.consumo),str(self.hidrante.vazao),str(self.hidrante.vazamento_valor),str(self.hidrante.fechado)))
             time.sleep(self.hidrante.delay)
+    
+    # método que recebe os dados do brocker
+    def HidrometroClientSub(self,host_to_connect,port_to_connect):
+        while True:
+            try:
+                mqtt_client.Client_Connect(self.clientMQTTSub,host_to_connect,port_to_connect) #Conecta ao broker
+            except Exception as err:
+                print("Erro na conexão do hidrometro - " + err)
+            
+            hid_id = str(self.hidrante.id)
+            #inscreve cliente no topicos
+            mqtt_client.Subscribe(self.clientMQTTSub,"hidrometro/"+str(self.hidrante.id)+"/fechado/tipo")
+            mqtt_client.Subscribe(self.clientMQTTSub,"hidrometro/"+str(self.hidrante.id)+"/delay")
+            time.sleep(self.hidrante.delay)
 
 def main():
 
@@ -77,11 +97,15 @@ def main():
 
     try:
         server_process = Process(target=hidrometro.HidrometroClient, args=(connect_host,connect_port,))
-        server_process.start()
+        server_process1 = Process(target=hidrometro.HidrometroClientSub, args=(connect_host,connect_port,))
+        #server_process.start()
+        server_process1.start()
+
     except KeyboardInterrupt:
         print("Fechando os processos")   
     finally:
-        server_process.join()
+        #server_process.join()
+        server_process1.join()
         print("Fechando o programa")   
 
 
