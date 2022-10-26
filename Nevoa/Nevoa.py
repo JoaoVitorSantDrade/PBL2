@@ -1,6 +1,9 @@
 import paho.mqtt.client as mqtt
 import mycallbacks
 import paho.mqtt.publish as publish
+from random import seed
+from random import randint
+import time
 
 # Lista dos ids de clientes conectados
 lista_clients_conectados = []
@@ -13,6 +16,16 @@ lista_fechado_clients = {}
 lista_vazamento_valor_clients = {}
 lista_delay_clients = {}
 
+#cria objeto nevoa
+def nevoaCliente(id):
+    client = mqtt.Client(client_id=str(id))
+    #client.username_pw_set()
+    client.on_message = mycallbacks.on_message
+    client.on_connect = mycallbacks.on_connect
+    client.on_publish = mycallbacks.on_publish
+    return client
+#-------------------------------------------------------------------------------------------------
+#  Logs de conexão e publicação 
 # Quando uma nova conexão é feita com o brocker
 def on_connect_nuvem(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
@@ -24,6 +37,9 @@ def on_connect_nuvem(client, userdata, flags, rc):
 # Quando uma nova publicação é feita pela névoa no brocker
 def on_publish_nevoa(client,userdata,mid):
     print(mid)
+
+#-------------------------------------------------------------------------------------------------
+#   Métodos para registro dos dados lidos no brocker 
 
 # Quando é feita uma publicação no topico em que a névoa esta inscrita 
 # Define o topico e atualiza os dados no dicionario
@@ -56,18 +72,24 @@ def on_message_nevoa(client,userdata,message,tmp=None):
 def on_message_nevoa_to_getClients(client, userdata, message,tmp=None):
     lista_clients_conectados.append(client.id)
 
+#-------------------------------------------------------------------------------------------------
 
+#-------------------------------------------------------------------------------------------------
+#   Métodos de inscrição de topicos para o cliente
 def sub_to_getClients(client):
     client.subscribe("IDENTIFIER/#")
     return client
 
-
 def sub_to_getValues(client):
     client.subscribe("hidrometros/"+client.id+"/#") # se inscreve no topico da sua nevoa
-    # para receber valores dos seus hidromeros
+    return client
 
+#-------------------------------------------------------------------------------------------------
 
-# Cria instância de cliente para observar ids dos hidrometros
+#-------------------------------------------------------------------------------------------------
+#   Métodos para criação dos clintes mqqt da Nevoa
+
+#   Cria instância de cliente para observar ids dos hidrometros
 def create_client_to_se_how_many(id_nevoa):
     client = mqtt.Client(client_id=str(id_nevoa))
     #client.username_pw_set()
@@ -85,8 +107,7 @@ def create_default_client(id_nevoa):
     #client.on_publish = mycallbacks.on_publish
     return client
 
-def main():
-    pass
+#-------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     main()
