@@ -5,9 +5,13 @@ import paho.mqtt.publish as publish
 # Lista dos ids de clientes conectados
 lista_clients_conectados = []
 # Dicionario com dados do clientes conectados
-lista_clients = {}
-
+#lista_clients = {}
 lista_consumo_clients = {}
+lista_vazao_clients = {}
+lista_vazamento_clients = {}
+lista_fechado_clients = {}
+lista_vazamento_valor_clients = {}
+lista_delay_clients = {}
 
 # Quando uma nova conexão é feita com o brocker
 def on_connect_nuvem(client, userdata, flags, rc):
@@ -31,19 +35,21 @@ def on_message_nevoa(client,userdata,message,tmp=None):
     if topico == "hidrometro/"+id_client+"/consumo":
         consumo = int(msg)
         lista_consumo_clients[id_client] = consumo
-        pass
     elif topico == "hidrometro/"+id_client+"/vazao":
-        pass
+        vazao =float(msg)
+        lista_vazao_clients[id_client] = vazao
     elif topico == "hidrometro/"+id_client+"/vazamento":
-        pass
+        vazamento = float(msg)
+        lista_vazamento_clients[id_client] =vazamento
     elif topico == "hidrometro/"+id_client+"/fechado":
-        pass
+        fechado = bool(msg)
+        lista_fechado_clients[id_client] = fechado
     elif topico == "hidrometro/"+id_client+"/vazamento_valor":
-        pass
+        vazamento_valor = float(msg)
+        lista_vazamento_valor_clients[id_client] = vazamento_valor
     elif topico == "hidrometro/"+id_client+"/delay":
-        pass
-
-    lista_clients[id_client]= msg 
+        delay = float(msg)
+        lista_vazamento_valor_clients[id_client] = delay
 
 # Quando é feita uma publicação no topico de ids de hidrometros
 # Insere o id na Lista
@@ -78,3 +84,9 @@ def create_default_client(id_nevoa):
     #client.on_connect = mycallbacks.on_connect
     #client.on_publish = mycallbacks.on_publish
     return client
+
+def main():
+    pass
+
+if __name__ == '__main__':
+    main()
