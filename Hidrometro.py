@@ -21,26 +21,26 @@ class Hidrometro:
         self.clientMQTT = mqtt_client.Client(hidrante.id)
         
         #cria cliente mqqt para receber dados
-        self.clientMQTTSub = mqtt_client.Client(hidrante.id)
+        self.clientMQTTSub = mqtt_client.Client(hidrante.id+1)
 
     def HidrometroServerMQTT():
         pass
     
     # método que executa a publicação de dados
     def HidrometroClient(self,host_to_connect,port_to_connect): #Envia os dados para o servidor (Nuvem)
+        
+        try:
+            mqtt_client.Client_Connect(self.clientMQTT,host_to_connect,port_to_connect) #Conecta ao broker
+        except Exception as err:
+            print("Erro na conexão do hidrometro - " + err)
+        print("Conexão finalzada!")
+
         while True: 
             print("Conexão iniciada")
-            if(self.hidrante.fechado == False):
+            if(self.hidrante.fechado == 0):
                 self.hidrante.ContabilizarConsumo()
             else:
                 print("Hidrometro fechado - consumo não contabilizado")
-
-            try:
-                mqtt_client.Client_Connect(self.clientMQTT,host_to_connect,port_to_connect) #Conecta ao broker
-            except Exception as err:
-                print("Erro na conexão do hidrometro - " + err)
-            print("Conexão finalzada!")
-            
             #Pesca p/ topicos "mynevoaid/hidrometro/id_hidrometro/#"
             hid_id = str(self.hidrante.id)
             #pega os dados e envia p/ broker
@@ -64,16 +64,17 @@ class Hidrometro:
     
     # método que recebe os dados do brocker
     def HidrometroClientSub(self,host_to_connect,port_to_connect):
+        try:
+            mqtt_client.Client_Connect(self.clientMQTTSub,host_to_connect,port_to_connect) #Conecta ao broker
+        except Exception as err:
+            print("Erro na conexão do hidrometro - " + err)
+
+        hid_id = str(self.hidrante.id)
+        #inscreve cliente no topicos
+        mqtt_client.Subscribe(self.clientMQTTSub,"hidrometro/"+str(self.hidrante.id)+"/fechado")
+        mqtt_client.Subscribe(self.clientMQTTSub,"hidrometro/"+str(self.hidrante.id)+"/delay")
         while True:
-            try:
-                mqtt_client.Client_Connect(self.clientMQTTSub,host_to_connect,port_to_connect) #Conecta ao broker
-            except Exception as err:
-                print("Erro na conexão do hidrometro - " + err)
-            
-            hid_id = str(self.hidrante.id)
-            #inscreve cliente no topicos
-            mqtt_client.Subscribe(self.clientMQTTSub,"hidrometro/"+str(self.hidrante.id)+"/fechado/tipo")
-            mqtt_client.Subscribe(self.clientMQTTSub,"hidrometro/"+str(self.hidrante.id)+"/delay")
+          
             time.sleep(self.hidrante.delay)
 
 def main():
@@ -83,7 +84,7 @@ def main():
 
     os.system('cls' if os.name == 'nt' else 'clear')
 
-    hidro = Hidrante.Hidrante(0,False,0,False,1,10)
+    hidro = Hidrante.Hidrante(0,False,0,0,1,10)
 
     hidrometro = Hidrometro(hidro) #ip do broker, porta do brocker
 
@@ -97,18 +98,44 @@ def main():
     #hidrometro.clientMQTT.subscribe("nevoa_test/hidrometro/"+str(hidrometro.hidrante.id)+"/delay")
 
     try:
-        server_process = Process(target=hidrometro.HidrometroClient, args=(connect_host,connect_port,))
-        server_process1 = Process(target=hidrometro.HidrometroClientSub, args=(connect_host,connect_port,))
-        server_process.start()
-        #server_process1.start()
-
+        #server_process = Process(target=hidrometro.HidrometroClient, args=(connect_host,connect_port,))
+        #server_process.start()
+        publicacao = Thread(target=hidrometro.HidrometroClient, args=(connect_host,connect_port))
+        leitura = Thread(target=hidrometro.HidrometroClientSub, args=(connect_host,connect_port))
     except KeyboardInterrupt:
         print("Fechando os processos")   
     finally:
-        server_process.join()
-        #server_process1.join()
+        #publicacao.start()
+        leitura.start()
         print("Fechando o programa")   
 
+
+def on_message(client, userdata, message,tmp=None):
+    #print(" Received message " + str(message.payload)+ " on topic '" + message.topic+ "' with QoS " + str(message.qos))
+    #id_client = client.client_id
+    topico = message.topic
+    msg = message.payload
+    print("Mensagem recebida")
+    #print("topico="+topico)
+    #print(msg)
+
+    if(topico == "hidrometro"+str(hidrante.id)+"fechado"):
+        bloqueio = int(msg)
+        print("Bloqueado com valor"+str(bloqueio))
+    elif(topico == "hidrometro"+str(hidrante.id)+"delay"):
+        delay = float(msg)
+        print("Nova delay eh:"+delay)
+    
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code "+str(rc))
+
+    # Subscribing in on_connect() means that if we lose the connection and
+    # reconnect then subscriptions will be renewed.
+    #client.subscribe("$SYS/#")
+
+def on_publish(client,userdata,mid):
+    #print(mid)
+    print("publicado")
 
 if __name__ == '__main__':
     main()

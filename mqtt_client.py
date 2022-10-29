@@ -1,13 +1,16 @@
+from cgi import print_form
 import paho.mqtt.client as mqtt
-import mycallbacks
+from Hidrante import Hidrante
 import paho.mqtt.publish as publish
+import Hidrometro
+
 
 def Client(id):
     client = mqtt.Client(client_id=str(id))
     #client.username_pw_set()
-    client.on_message = mycallbacks.on_message
-    client.on_connect = mycallbacks.on_connect
-    client.on_publish = mycallbacks.on_publish
+    client.on_message = Hidrometro.on_message
+    client.on_connect = Hidrometro.on_connect
+    client.on_publish = Hidrometro.on_publish
     return client
 
 def Client_Connect(client,host,port):
@@ -24,9 +27,11 @@ def Subscribe(client,topic):
     
 def Multiple(client_id,host,port,msg):
     publish.multiple(msg, hostname=host,port=port,client_id=client_id)
+      
 
 if __name__ == "__main__":
     cliente = Client(5)
     Client_Connect(cliente,"localhost",1883)
     Publish(cliente,"temperatura/test","teste")
     print("rodou")
+
