@@ -1,10 +1,11 @@
 from shutil import ExecError
 from threading import local
-from turtle import delay
+from threading import Thread
 import Hidrante
 import mqtt_client
 import Config
 from multiprocessing import Process, Manager
+from threading import Thread
 import time
 import os
 import json
@@ -98,14 +99,14 @@ def main():
     try:
         server_process = Process(target=hidrometro.HidrometroClient, args=(connect_host,connect_port,))
         server_process1 = Process(target=hidrometro.HidrometroClientSub, args=(connect_host,connect_port,))
-        #server_process.start()
-        server_process1.start()
+        server_process.start()
+        #server_process1.start()
 
     except KeyboardInterrupt:
         print("Fechando os processos")   
     finally:
-        #server_process.join()
-        server_process1.join()
+        server_process.join()
+        #server_process1.join()
         print("Fechando o programa")   
 
 
