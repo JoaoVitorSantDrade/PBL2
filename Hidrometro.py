@@ -119,12 +119,12 @@ def on_message(client, userdata, message,tmp=None):
     #print("topico="+topico)
     #print(msg)
 
-    if(topico == "hidrometro"+str(hidrante.id)+"fechado"):
-        bloqueio = int(msg)
-        print("Bloqueado com valor"+str(bloqueio))
-    elif(topico == "hidrometro"+str(hidrante.id)+"delay"):
-        delay = float(msg)
-        print("Nova delay eh:"+delay)
+    #if(topico == "hidrometro"+str(hidrante.id)+"fechado"):
+    #   bloqueio = int(msg)
+    #    print("Bloqueado com valor"+str(bloqueio))
+    #elif(topico == "hidrometro"+str(hidrante.id)+"delay"):
+    #    delay = float(msg)
+    #    print("Nova delay eh:"+delay)
     
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
