@@ -71,8 +71,8 @@ class Hidrometro:
 
         hid_id = str(self.hidrante.id)
         #inscreve cliente no topicos
-        mqtt_client.Subscribe(self.clientMQTTSub,"hidrometro/"+str(self.hidrante.id)+"/fechado")
-        mqtt_client.Subscribe(self.clientMQTTSub,"hidrometro/"+str(self.hidrante.id)+"/delay")
+        mqtt_client.Subscribe(self.clientMQTTSub,"nevoa/hidrometro/"+str(self.hidrante.id)+"/fechado")
+        mqtt_client.Subscribe(self.clientMQTTSub,"nevoa/hidrometro/"+str(self.hidrante.id)+"/delay")
         while True:
           
             time.sleep(self.hidrante.delay)

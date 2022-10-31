@@ -6,6 +6,7 @@ from random import randint
 import time
 import os
 
+
 # Lista dos ids de clientes conectados
 lista_clients_conectados = []
 # Dicionario com dados do clientes conectados
@@ -47,6 +48,14 @@ def on_publish_nevoa(client,userdata,mid):
 def on_publish(client,userdata,mid):
     #print(mid)
     print("publicado")
+
+#-------------------------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------------------------
+#   Método para publicação em topicos
+def Publish(client,topic,message):
+    client.publish("IDENTIFIER/" + str(client._client_id),"1")
+    return client.publish(topic,message)
 
 #-------------------------------------------------------------------------------------------------
 #   Métodos para registro dos dados lidos no brocker 
@@ -92,7 +101,9 @@ def on_message_nevoa(client,userdata,message,tmp=None):
 # Quando é feita uma publicação no topico de ids de hidrometros
 # Insere o id na Lista
 def on_message_nevoa_to_getClients(client, userdata, message,tmp=None):
-    lista_clients_conectados.append(client.id)
+    msg =message.payload
+    print("Novo cliente"+str(msg))
+    lista_clients_conectados.append(client._client_id)
 
 #   Quando é feita uma publicação na Nuvem para a Nevoa
 def on_message_nuvem(client,userdata,message,tmp=None):
@@ -118,8 +129,13 @@ def on_message_nuvem(client,userdata,message,tmp=None):
         print("novo limite de consumo:"+str(limite_consumo))
         pass
     elif topico == "nuvem/bloquear":
-        pass
-    elif topico == "nuvem/solitar_media":
+        # nuvem publica idHidrometro-tipoBloqueio
+        dados = str(msg)
+        dados = dados.split('-')
+        #if lista_clients_conectados.count(dados[0]) > 1:
+        Publish(client,"nevoa/hidrometro/"+dados[0]+"/fechado",str(dados[1]))
+       
+    elif topico == "nuvem/solicitar_media":
         pass
 
 def on_connect(client, userdata, flags, rc):
@@ -133,7 +149,7 @@ def on_connect(client, userdata, flags, rc):
 #-------------------------------------------------------------------------------------------------
 #   Métodos de inscrição de topicos para o cliente
 def sub_to_getClients(client):
-    client.subscribe("IDENTIFIER/#")
+    client.subscribe("ID/#")
     return client
 
 def sub_to_getValues(client):
@@ -153,8 +169,8 @@ def create_client_to_se_how_many(id_nevoa):
     client = mqtt.Client(client_id=str(id_nevoa))
     #client.username_pw_set()
     client.on_message = on_message_nevoa_to_getClients
-    #client.on_connect = mycallbacks.on_connect
-    #client.on_publish = mycallbacks.on_publish
+    client.on_connect = on_connect
+    client.on_publish = on_publish
     return client
 
 # Cria instância de cliente para observar topico de plubicação de dados
@@ -190,9 +206,11 @@ def executar_Leitura(host_to_connect,port_to_connect):
     while True:
         time.sleep(3)
 
+#   executa a publicação de dados
 def executar_Publicacao(host_to_connect,port_to_connect):
    pass
 
+#   Executa a Leitura e realiza operações solicitadas pela nuvem
 def executar_Leitura_Nuvem(host_to_connect,port_to_connect):
     clientMQTT = create_cliente_nuvem(id)
     try:
@@ -202,6 +220,19 @@ def executar_Leitura_Nuvem(host_to_connect,port_to_connect):
     print("Conexão finalzada!")
 
     clientMQTT = sub_to_getValues_nuvem(clientMQTT)
+    while True:
+        time.sleep(3)
+
+#   Executa o registro dos hidrometros clientes na nevoa
+def executar_registro(host_to_connect,port_to_connect):
+    clientMQTT = create_client_to_se_how_many(10)
+    try:
+        Client_Connect(clientMQTT,host_to_connect,port_to_connect) #Conecta ao broker
+    except Exception as err:
+        print("Erro na conexão do hidrometro - " + err)
+    print("Conexão finalzada!")
+    clientMQTT = sub_to_getClients(clientMQTT)
+
     while True:
         time.sleep(3)
 
@@ -217,11 +248,13 @@ def main():
     try:
         leitura = Thread(target=executar_Leitura , args=(connect_host,connect_port))
         leitura_nuvem = Thread(target=executar_Leitura_Nuvem,args=(connect_host,connect_port))
+        registro_clientes = Thread(target= executar_registro, args=(connect_host,connect_port))
     except KeyboardInterrupt:
         print("Fechando os processos")   
     finally:
         leitura.start()
         leitura_nuvem.start()
+        registro_clientes.start()
         print("Fechando o programa") 
 
 if __name__ == '__main__':
