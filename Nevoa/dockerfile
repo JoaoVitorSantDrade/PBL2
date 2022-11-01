@@ -23,6 +23,8 @@ RUN python3.10 -m pip install --upgrade pip
 
 RUN pip install flask
 
+RUN pip install paho-mqtt
+
 RUN service mosquitto start
 
 EXPOSE 1883
