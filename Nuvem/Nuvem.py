@@ -29,8 +29,8 @@ def on_message_From_nevoa(client,userdata,message,tmp=None):
     msg = message.payload
     # salvar valor no client especifico
     dic = {id_client:msg}
-    if topico == ""
-    media_nevoas_conectadas['id'] = dic
+    if topico == "":
+        media_nevoas_conectadas['id'] = dic
 
 # Inscreve nuvem no topico do brocker para receber Ids das nevoas
 def sub_to_getNevoas(client):
@@ -54,5 +54,7 @@ def on_publish_nuvem(client,userdata,mid):
     print(mid)
 
 if __name__ == '__main__':
+    #Nuvem tem um brocker
+    #Nevoas devem enviar p/ o brocker da Nuvem
     clt = create_default_client(45)
     sub_to_getNevoas(clt)
