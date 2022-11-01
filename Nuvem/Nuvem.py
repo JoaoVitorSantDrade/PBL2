@@ -3,7 +3,7 @@ import paho.mqtt.publish as publish
 import config_nuvem
 
 # Lista das médias das nevoas conectadas
-dados_nevoa= {'media_consumo':'0','total_hidrometros':'0'} # Oq cada nevoa retorna
+dados_nevoa = {'media_consumo':'0','total_hidrometros':'0'} # Oq cada nevoa retorna
 media_nevoas_conectadas = { 'id':dados_nevoa }
 
 
@@ -14,12 +14,9 @@ media_nevoas_conectadas = { 'id':dados_nevoa }
 #   A nuvem é inscrita
 
 # Quando uma nova conexão é feita com o brocker
-def on_connect_nevoa(client, userdata, flags, rc):
+def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
 
-    # Subscribing in on_connect() means that if we lose the connection and
-    # reconnect then subscriptions will be renewed.
-    client.subscribe("$SYS/#")
 
 # Quando é feita uma publicação no topico em que a Nuvem esta inscrita 
 # Define o topico e atualiza os dados no dicionario
@@ -40,10 +37,7 @@ def sub_to_getNevoas(client):
 # Cria instância de cliente para observar topico de plubicação de dados de média parcial e quantidade de hidrometros por nevoa
 def create_default_client(id_nevoa):
     client = mqtt.Client(client_id=str(id_nevoa))
-    #client.username_pw_set()
     client.on_message = on_message_From_nevoa
-    #client.on_connect = mycallbacks.on_connect
-    #client.on_publish = mycallbacks.on_publish
     return client
 
 #_______________________________________________________________________________________________________________
