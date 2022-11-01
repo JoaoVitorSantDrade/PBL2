@@ -6,13 +6,14 @@ from random import randint
 import time
 import os
 import json
+import operator
 
 #consumo vazao vazamento fechado vazamento_valor delay
 #   Valores fixos para bloqueio dos Hidrometros
 
 class Nevoa:
 
-    def __init__(self,brocker,brocker_port,nuvem,nuvem_port):
+    def __init__(self,brocker,brocker_port,nuvem,nuvem_port,delay):
         self.id = randint(0,1000)
         self.Client = self.create_default_client(self.id)
         self.Client_Nuvem = self.create_cliente_nuvem(self.id)
@@ -21,6 +22,7 @@ class Nevoa:
         self.nuvem = nuvem
         self.nuvem_port = nuvem_port
         self.lista_clientes = {}
+        self.delay = delay
 
     def Client_Connect(self,client,host,port):
         client.connect(host,port=port,keepalive=60)
@@ -38,7 +40,7 @@ class Nevoa:
     def on_message_nevoa(self,client,userdata,message,tmp=None):
         topico = message.topic
         msg = message.payload
-        
+        print(topico)
         subtopicos = topico.split('/')
         print(subtopicos[1])
         id_client = str(subtopicos[1])
@@ -72,6 +74,7 @@ class Nevoa:
         topico = message.topic
         msg = message.payload
         
+        print(topico)
         subtopicos = topico.split('/')
         print(subtopicos[1])
         #id_client = str(subtopicos[1])
@@ -125,37 +128,56 @@ class Nevoa:
         client.on_publish = self.on_publish
         return client
 
-    def executar_conexao_nuvem(self):
+    def executar_conexao_nuvem_brocker(self):
         try:
             self.Client_Connect(self.Client_Nuvem,self.nuvem,self.nuvem_port) #Conecta ao broker da nuvem
+
+            self.Client_Nuvem.subscribe("nevoa/"+ str(self.id) + "/hidrometro/#") # Recebe comandos para modificar coisas nos hidrometros
+
+            while True:
+                for key, value in self.lista_clientes:
+                    #consumo vazao vazamento fechado vazamento_valor delay
+                    x_json = {
+                        "ID": key,
+                        "consumo":value["consumo"],
+                        "vazao":value["vazao"],
+                        "vazamento":value["vazamento"],
+                        "fechado":value["fechado"],
+                        "vazamento_valor":value["vazamento_valor"],
+                        "delay":value["delay"]
+                    }
+
+                    x_string = json.dumps(x_json)
+                    x_json = json.loads(x_string)
+
+                    #Envia dados do hidrometro para nuvem
+                    self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/"+ x_json["ID"] +"/consumo/"+ x_json["consumo"])
+                    self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/"+ x_json["ID"] +"/vazao/"+ x_json["vazao"])
+                    self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/"+ x_json["ID"] +"/vazamento/"+ x_json["vazamento"])
+                    self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/"+ x_json["ID"] +"/fechado/"+ x_json["fechado"])
+                    self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/"+ x_json["ID"] +"/vazamento_valor/"+ x_json["vazamento_valor"])
+                    self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/"+ x_json["ID"] +"/delay/"+ x_json["delay"])
+
+                time.sleep(self.delay)
+
+        except Exception as err:
+            print("Erro na conexão da Nevoa com a Nuvem - " + str(err))         
+
+    def executar_conexao_nevoa_brocker(self):
+        try:
+            self.Client_Connect(self.Client,self.brocker,self.brocker_port) #Conecta ao broker da nevoa
+            self.Client.subscribe("hidrometro/#")
         except Exception as err:
             print("Erro na conexão da Nevoa com a Nuvem - " + str(err))
-        else:
-            print("Conexão finalzada!")
-            for key, value in self.lista_clientes:
-                #consumo vazao vazamento fechado vazamento_valor delay
-                x_json = {
-                    "ID": key,
-                    "consumo":value["consumo"],
-                    "vazao":value["vazao"],
-                    "vazamento":value["vazamento"],
-                    "fechado":value["fechado"],
-                    "vazamento_valor":value["vazamento_valor"],
-                    "delay":value["delay"]
-                }
+            
+    def sort_clients_by_consumo(self):
+        d = {}
+        for key, value in self.lista_clientes:
+            d[key] = int(value['consumo'])
 
-                x_string = json.dumps(x_json)
-                x_json = json.loads(x_string)
-
-                self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/"+x_json["ID"]+"/consumo/"+x_json["consumo"])
-                self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/"+x_json["ID"]+"/vazao/"+x_json["vazao"])
-                self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/"+x_json["ID"]+"/vazamento/"+x_json["vazamento"])
-                self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/"+x_json["ID"]+"/fechado/"+x_json["fechado"])
-                self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/"+x_json["ID"]+"/vazamento_valor/"+x_json["vazamento_valor"])
-                self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/"+x_json["ID"]+"/delay/"+x_json["delay"])
-
-    def executar_conexao_hidrometro(self):
-        pass
+        a = sorted(d.items(),key= operator.itemgetter(1))
+        return a
+    
 def main():
     
 
@@ -164,22 +186,18 @@ def main():
     nuvem_host = input("Digite o IP da Nuvem: ")
     nuvem_port = int(input("Digite a Porta da Nuvem: "))
 
-    nevoa = Nevoa(connect_host,connect_port,nuvem_host,nuvem_port)
+    nevoa = Nevoa(connect_host,connect_port,nuvem_host,nuvem_port,2)
 
     os.system('cls' if os.name == 'nt' else 'clear')
 
     #----------------------------------------------------
     try:
-        #leitura = Thread(target=nevoa.executar_Leitura , args=(connect_host,connect_port))
-        #leitura_nuvem = Thread(target=executar_Leitura_Nuvem,args=(connect_host,connect_port))
-        #registro_clientes = Thread(target= executar_registro, args=(connect_host,connect_port))
-        conectar_na_nuvem = Thread(target=nevoa.executar_conexao_nuvem)
+        conectar_na_nuvem = Thread(target=nevoa.executar_conexao_nuvem_brocker)
+        conectar_no_brocker = Thread(target=nevoa.executar_conexao_nevoa_brocker)
     except KeyboardInterrupt:
         print("Fechando os processos")   
     finally:
-        #leitura.start()
-        #leitura_nuvem.start()
-        #registro_clientes.start()
+        conectar_no_brocker.start()
         conectar_na_nuvem.start()
 
 if __name__ == '__main__':

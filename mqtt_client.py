@@ -1,8 +1,7 @@
 from cgi import print_form
 import paho.mqtt.client as mqtt
-from Hidrante import Hidrante
 import paho.mqtt.publish as publish
-import Hidrometro
+import Hidrometro.Hidrometro as Hidrometro
 
 
 def Client(id):
