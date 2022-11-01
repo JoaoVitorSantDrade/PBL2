@@ -17,7 +17,7 @@ class Hidrante:
         self.delay = delay
         seed(time.time())
         self.id = randint(0,100000)
-        self.vazao = randint(1,10) + randint(0,9) * 0.1 #obtém um valor aleatorio para vazao definida
+        self.vazao = floor(randint(1,10) + randint(0,9) * 0.1) #obtém um valor aleatorio para vazao definida
         self.tendencia = tendencia
 
     def ContabilizarConsumo(self): #Contabiliza o consumo do hidrometro
