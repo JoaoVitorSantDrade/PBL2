@@ -1,54 +1,55 @@
+from random import randint
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 import config_nuvem
 
 # Lista das médias das nevoas conectadas
-dados_nevoa = {'media_consumo':'0','total_hidrometros':'0'} # Oq cada nevoa retorna
-media_nevoas_conectadas = { 'id':dados_nevoa }
 
+class Nuvem:
 
-#_______________________________________________________________________________________________________________
+    def __init__(self,host,port):
+        self.id = randint(1,10)
+        self.host = host
+        self.port = port
+        self.cliente_nuvem_brocker = self.create_default_client(self.id)
 
-#_______________________________________________________________________________________________________________
-#   Métodos relacionados ao registro dos dados publicados nos canais em que 
-#   A nuvem é inscrita
+    # Quando uma nova conexão é feita com o brocker
+    def on_connect(self,client, userdata, flags, rc):
+        print("Conectamos no brocker da nuvem")
 
-# Quando uma nova conexão é feita com o brocker
-def on_connect(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
+    def on_message_From_nevoa(self,client,userdata,message,tmp=None):
+        #id_client = client._client_id
+        topico = str(message.topic)
+        msg = message.payload.decode("utf-8")
+        topico = topico.split('/')
+        # nuvem/nevoa/#/hidrometro/#/opcao
+        # nevoa/#/media
+        if "nevoa" in topico:
+            nevoa_id = topico[1]
+            if "media" in topico:
+                pass
 
+    def Client_Connect(self,client,host,port):
+            client.connect(host,port=port,keepalive=60)
+            client.loop_start()
 
-# Quando é feita uma publicação no topico em que a Nuvem esta inscrita 
-# Define o topico e atualiza os dados no dicionario
-def on_message_From_nevoa(client,userdata,message,tmp=None):
-    id_client = client.id
-    topico = message.topic
-    msg = message.payload
-    # salvar valor no client especifico
-    dic = {id_client:msg}
-    if topico == "":
-        media_nevoas_conectadas['id'] = dic
+    def create_default_client(self,id):
+        client = mqtt.Client(client_id=str(id))
+        client.on_message = self.on_message_From_nevoa
+        return client
 
-# Inscreve nuvem no topico do brocker para receber Ids das nevoas
-def sub_to_getNevoas(client):
-    client.subscribe("Nevoas/#") # Nuvem se inscreve nos topicos das nevoas, recebendo todos os seus dados
-    return client
+    def connect_to_brocker(self,brocker,port):
+        try:
+            self.Client_Connect(self.cliente_nuvem_brocker,self.host,self.port) #Conecta ao broker da nuvem
+            self.cliente_nuvem_brocker.subscribe("nevoa/#")
+            pass
+        except Exception:
+            pass
 
-# Cria instância de cliente para observar topico de plubicação de dados de média parcial e quantidade de hidrometros por nevoa
-def create_default_client(id_nevoa):
-    client = mqtt.Client(client_id=str(id_nevoa))
-    client.on_message = on_message_From_nevoa
-    return client
-
-#_______________________________________________________________________________________________________________
-#   Métodos relacionados a publicação de dados pela Nuvem
-
-# Quando uma nova publicação é feita pela Nuvem no brocker
-def on_publish_nuvem(client,userdata,mid):
-    print(mid)
 
 if __name__ == '__main__':
-    #Nuvem tem um brocker
-    #Nevoas devem enviar p/ o brocker da Nuvem
-    clt = create_default_client(45)
-    sub_to_getNevoas(clt)
+    
+    host = input("Digite o IP do brocker: ")
+    host_port = int(input("Digite a Porta do brocker: "))
+    nuvem = Nuvem(host,host_port)
+

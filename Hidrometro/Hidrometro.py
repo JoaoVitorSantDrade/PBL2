@@ -36,11 +36,13 @@ class Hidrometro:
 
         hid_id = str(self.hidrante.id)
 
-        self.clientMQTT.publish("hidrometro/"+ hid_id + "/delay",str(self.hidrante.delay))
-        self.clientMQTT.publish("hidrometro/"+ hid_id + "/fechado",str(self.hidrante.fechado))
+        self.clientMQTT.publish("hidrometro/"+ hid_id + "/delay",str(self.hidrante.delay), 1)
+        self.clientMQTT.publish("hidrometro/"+ hid_id + "/fechado",str(self.hidrante.fechado), 1)
+        self.clientMQTT.publish("hidrometro/"+ hid_id + "/tendencia", str(self.hidrante.tendencia), 1)
 
         self.clientMQTT.subscribe("hidrometro/"+ hid_id +"/fechado", 1)
         self.clientMQTT.subscribe("hidrometro/"+ hid_id +"/delay", 1)
+        self.clientMQTT.subscribe("hidrometro/"+ hid_id + "/tendencia", 1)
 
         while True: 
             print("Conexão iniciada")

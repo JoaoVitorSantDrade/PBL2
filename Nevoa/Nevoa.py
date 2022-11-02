@@ -73,6 +73,10 @@ class Nevoa:
         elif topico == "hidrometro/"+id_client+"/delay":
             delay = int(msg)
             self.lista_clientes[id_client].update({"delay":delay})
+        
+        elif topico == "hidrometro/"+id_client+"/tendencia":
+            tendencia = int(msg)
+            self.lista_clientes[id_client].update({"tendencia":tendencia})
 
     def on_message_nuvem(self,client,userdata,message,tmp=None):
         topico = message.topic
@@ -93,6 +97,10 @@ class Nevoa:
                 elif "delay" in topico:
                     self.lista_clientes[hid_id].update({"delay":floor(float(msg))}) #Atualiza no dicionario
                     self.Client.publish("hidrometro/"+ hid_id + "/delay", floor(float(msg)))
+
+                elif "tendencia" in topico:
+                    self.lista_clientes[hid_id].update({"tendencia":floor(int(msg))}) #Atualiza no dicionario
+                    self.Client.publish("hidrometro/" + hid_id + "/tendencia", floor(int(msg)))
 
         #Pesca -> nevoa/#/opcao
         elif "nevoa" in topico:
@@ -145,6 +153,7 @@ class Nevoa:
                             'vazao':value['vazao'],
                             'vazamento':value['vazamento'],
                             'vazamento_valor':value['vazamento_valor'],
+                            'tendencia':value['tendencia'],
                             'fechado':value['fechado'],
                             'delay':value['delay']
                         }
@@ -161,6 +170,7 @@ class Nevoa:
                     self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/"+ x_json["ID"] +"/fechado", x_json["fechado"],qos=1)
                     self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/"+ x_json["ID"] +"/vazamento_valor", x_json["vazamento_valor"],qos=1)
                     self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/"+ x_json["ID"] +"/delay", x_json["delay"],qos=1)
+                    self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/"+ x_json["ID"] +"/tendencia", x_json["tendencia"],qos=1)
 
                 if i > 0:
                     media = media/i
