@@ -176,6 +176,19 @@ class Nevoa:
                     media = media/i
                     self.Client_Nuvem.publish("nevoa/" + str(self.id) + "/media", media)
 
+                try:
+                    i = 0
+                    for key, value in self.lista_ordenada.items():
+                        x_json = {
+                            'ID':str(key),
+                            'consumo':value['consumo']
+                        }
+                        x_string = json.dumps(x_json)
+                        self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/consumo/"+ str(i), payload=x_string,retain=True,qos=1)
+                        i = i + 1
+                except Exception:
+                    pass
+
                 time.sleep(self.delay)
 
         except Exception as err:
