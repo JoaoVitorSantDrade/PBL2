@@ -15,7 +15,6 @@ import json
 
 # Lista das médias das nevoas conectadas
 
-list_of_nevoa = defaultdict(dict)
 list_of_consumo = defaultdict(dict)
 lista_ordenada = defaultdict(dict)
 
@@ -40,7 +39,6 @@ class Nuvem:
         # nevoa/#/media
         if "nevoa" in topico:
             nevoa_id = topico[1]
-            list_of_nevoa[nevoa_id] = nevoa_id
             if "media" in topico:
                 pass
             elif "hidrometro" in topico:
@@ -64,7 +62,8 @@ class Nuvem:
         try:
             self.Client_Connect(self.cliente_nuvem_brocker,self.host,self.port) #Conecta ao broker da nuvem
             #self.cliente_nuvem_brocker.subscribe("nevoa/#")
-            self.cliente_nuvem_brocker.subscribe("nevoa/+/hidrometro/+/consumo/#")
+            
+            self.cliente_nuvem_brocker.subscribe("nevoa/+/hidrometro/#")
             pass
         except Exception:
             pass
@@ -99,20 +98,20 @@ def top():
     if "top-consumo" in args:
         if args["top-consumo"] != "":
             consumo = int(args['top-consumo'])
-        i = 0
-        for key, value in lista_ordenada.items():
-            if i < consumo:
-                p_tag = soup.new_tag('p')
-                p_tag.string = str(i + 1) + "º -> " + key + " - " + str(value["consumo"]) + " m³/s"
+            i = 0
+            for key, value in lista_ordenada.items():
+                if i < consumo:
+                    p_tag = soup.new_tag('p')
+                    p_tag.string = str(i + 1) + "º -> " + key + " - " + str(value["consumo"]) + " m³/s"
 
-                div_tag = soup.new_tag('div')
-                div_tag['class'] = "show"
-                div_tag.insert(0,p_tag)
+                    div_tag = soup.new_tag('div')
+                    div_tag['class'] = "show"
+                    div_tag.insert(0,p_tag)
 
-                container_tag.insert_before(div_tag)
-                print("ID: " + key + " - Consumo: " + str(value["consumo"]))
-                i = i + 1
-    return soup.prettify()
+                    container_tag.insert_before(div_tag)
+                    i = i + 1
+            return soup.prettify()
+    return "Not Found"
 
 @app.route('/api/top', methods=['GET'])
 def api_top():
@@ -123,38 +122,37 @@ def api_top():
     if "top-consumo" in args:
         if args["top-consumo"] != "":
             consumo = int(args['top-consumo'])
-        i = 0
-        js = defaultdict(dict)
-        for key, value in lista_ordenada.items():
-            if i < consumo:
-                x = {
-                    "ID": key,
-                    "consumo": value["consumo"],
-                }
-                js[str(i)].update(x)
-                i = i + 1
-    return js
+            i = 0
+            js = defaultdict(dict)
+            for key, value in lista_ordenada.items():
+                if i < consumo:
+                    x = {
+                        "ID": key,
+                        "consumo": value["consumo"],
+                    }
+                    js[str(i)].update(x)
+                    i = i + 1
+            return js
+    return "Not Found"
     
 @app.route('/api/hidrometro', methods=['GET'])
 def api_hid_only():
 
     args = request.args
     args = args.to_dict()
-
     if "hidrometro" in args:
         if args["hidrometro"] != "":
             hidrometro = str(args['hidrometro'])
-        i = 0
-        js = defaultdict(dict)
-        for key, value in lista_ordenada.items():
-            if hidrometro in value:
-                x = {
-                    "ID": key,
-                    "consumo": value["consumo"],
-                }
-                js[str(i)].update(x)
-                i = i + 1
-    return js
+            js = defaultdict(dict)
+            for key, value in lista_ordenada.items():
+                if hidrometro in key:
+                    x = {
+                        "ID": key,
+                    }
+                    js.update(x)
+                    return js
+
+    return "Not Found"   
 
 if __name__ == '__main__':
 
