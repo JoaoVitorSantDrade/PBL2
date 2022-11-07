@@ -11,11 +11,13 @@ import time
 from threading import Thread
 import codecs
 from bs4 import BeautifulSoup
+import json
 
 # Lista das médias das nevoas conectadas
 
 list_of_nevoa = defaultdict(dict)
 list_of_consumo = defaultdict(dict)
+lista_ordenada = defaultdict(dict)
 
 class Nuvem:
 
@@ -34,7 +36,6 @@ class Nuvem:
         topico = str(message.topic)
         msg = message.payload.decode("utf-8")
         topico = topico.split('/')
-        print(topico)
         # nuvem/nevoa/#/hidrometro/#/opcao
         # nevoa/#/media
         if "nevoa" in topico:
@@ -46,8 +47,7 @@ class Nuvem:
                 if "consumo" in topico:
                     hidrometro = topico[3]
                     identifier = nevoa_id + "-" + hidrometro
-                    list_of_consumo[nevoa_id].update({"identificador":identifier,"consumo":float(msg)})
-                    print(list_of_consumo.items())
+                    list_of_consumo[identifier].update({"consumo":float(msg)})
                     #pesca -> nevoa/"+ str(self.id) + "/hidrometro/"+ str(i) +"/consumo/" + str(key)
                     pass
 
@@ -69,63 +69,104 @@ class Nuvem:
         except Exception:
             pass
 
-    def sort_clients_by_consumo(self):
-        while True:
-            d = {}
-            for key, value in list_of_consumo.items():
-                d[key] = int(value['consumo'])
-            try:
-                self.lista_ordenada = sorted(d.items(),key= operator.itemgetter(1))
-            except Exception:
-                pass
-            finally:
-                time.sleep(2)
-
-def main():
-    # run app in debug mode on port 5000
-    host = input("Digite o IP do brocker: ")
-    host_port = int(input("Digite a Porta do brocker: "))
-    nuvem = Nuvem(host,host_port)
-    os.system('cls' if os.name == 'nt' else 'clear')
-    
-    try:
-        conectar_no_brocker = Thread(target=nuvem.connect_to_brocker)
-        organizar_info = Thread(target=nuvem.sort_clients_by_consumo)
-        organizar_info.start()
-        conectar_no_brocker.start()
-
-    except KeyboardInterrupt:
-        print("Fechando os processos")   
-    finally:
-        organizar_info.join()
-        conectar_no_brocker.join()
-
+def sort_clients_by_consumo():
+    while True:
+        d = {}
+        for key, value in list_of_consumo.items():
+            d[key] = int(value['consumo'])
+        try:
+            lista = sorted(d.items(),key= operator.itemgetter(1), reverse=True)
+            for key, value in lista:
+                lista_ordenada[str(key)].update({"consumo":str(value)})
+        except Exception as ext:
+            print(ext)
+        finally:
+            time.sleep(2)
 
 app = Flask(__name__)
-@app.route('/', methods=['GET'])
-def see_hidrometro():
+@app.route('/top', methods=['GET'])
+def top():
+
     args = request.args
     args = args.to_dict()
+
     f=codecs.open("Nuvem/form.html", 'r', 'utf-8')
     html = f.read()
     soup = BeautifulSoup(html, "html.parser")
-    soup.find_all("div", class_="container")
-    print(list_of_consumo.items())
-    return html
+    
+    container_tag = soup.find("div", class_="container")
 
+    if "top-consumo" in args:
+        if args["top-consumo"] != "":
+            consumo = int(args['top-consumo'])
+        i = 0
+        for key, value in lista_ordenada.items():
+            if i < consumo:
+                p_tag = soup.new_tag('p')
+                p_tag.string = str(i + 1) + "º -> " + key + " - " + str(value["consumo"]) + " m³/s"
 
+                div_tag = soup.new_tag('div')
+                div_tag['class'] = "show"
+                div_tag.insert(0,p_tag)
+
+                container_tag.insert_before(div_tag)
+                print("ID: " + key + " - Consumo: " + str(value["consumo"]))
+                i = i + 1
+    return soup.prettify()
+
+@app.route('/api/top', methods=['GET'])
+def api_top():
+
+    args = request.args
+    args = args.to_dict()
+
+    if "top-consumo" in args:
+        if args["top-consumo"] != "":
+            consumo = int(args['top-consumo'])
+        i = 0
+        js = defaultdict(dict)
+        for key, value in lista_ordenada.items():
+            if i < consumo:
+                x = {
+                    "ID": key,
+                    "consumo": value["consumo"],
+                }
+                js[str(i)].update(x)
+                i = i + 1
+    return js
+    
+@app.route('/api/hidrometro', methods=['GET'])
+def api_hid_only():
+
+    args = request.args
+    args = args.to_dict()
+
+    if "hidrometro" in args:
+        if args["hidrometro"] != "":
+            hidrometro = str(args['hidrometro'])
+        i = 0
+        js = defaultdict(dict)
+        for key, value in lista_ordenada.items():
+            if hidrometro in value:
+                x = {
+                    "ID": key,
+                    "consumo": value["consumo"],
+                }
+                js[str(i)].update(x)
+                i = i + 1
+    return js
 
 if __name__ == '__main__':
 
     # run app in debug mode on port 5000
-    host = input("Digite o IP do brocker: ")
-    host_port = int(input("Digite a Porta do brocker: "))
+    host = input("Digite o IP da Nuvem: ")
+    host_port = int(input("Digite a Porta da Nuvem: "))
     nuvem = Nuvem(host,host_port)
     os.system('cls' if os.name == 'nt' else 'clear')
     
     try:
         conectar_no_brocker = Thread(target=nuvem.connect_to_brocker)
-        organizar_info = Thread(target=nuvem.sort_clients_by_consumo)
+        organizar_info = Thread(target=sort_clients_by_consumo)
         api = Thread(target=app.run)
         organizar_info.start()
         conectar_no_brocker.start()
