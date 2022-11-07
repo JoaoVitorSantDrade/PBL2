@@ -46,3 +46,10 @@ A nevoa consistiu dos nós de processamento entre os hidrômetros e a nuvem, for
 <p>
 Para acesso a aplicação foi criado uma API rest usando o framework Flask no python, a API disponibiliza os métodos para acesso das funcionalidades requisitadas como listar hidrômetros com maior consumo e bloquear um hidrômetro, a nível de implementação uma chamada do tipo Get ou Post é feita o servidor recebe o cabeçalho http e a partir da rota executa a  operação solicitada e se retorna um JSON respondendo a requisição.
 </p>
+<h1> 4 Resultados</h1>
+<h1> 5 Conclusão</h1>
+<h1>Referências</h1>
+
+<p>ROSS, Keith W.; KUROSE, James F. Redes de Computadores e a Internet: Uma abordagem top-down. São, 2006.</p>
+<p>RedHat. API REST. [2020]. Disponível em: <https://www.redhat.com/pt-br/topics/api/what-is-a-rest-api> Acesso em: 03 Nov. 2022.</p>
+<p>DevMedia. Rest tutorial. [2013]. Disponível em: < https://www.devmedia.com.br/rest-tutorial/28912> Acesso em: 03 Nov. 2022.</p>
