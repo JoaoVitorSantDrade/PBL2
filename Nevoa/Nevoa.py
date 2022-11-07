@@ -174,7 +174,7 @@ class Nevoa:
 
                 if i > 0:
                     media = media/i
-                    self.Client_Nuvem.publish("nevoa/" + str(self.id) + "/media", media)
+                    self.Client_Nuvem.publish("nevoa/" + str(self.id) + "/media", media, retain=True)
 
                 try:
                     i = 0
@@ -184,7 +184,7 @@ class Nevoa:
                             'consumo':value['consumo']
                         }
                         x_string = json.dumps(x_json)
-                        self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/consumo/"+ str(i), payload=x_string,retain=True,qos=1)
+                        self.Client_Nuvem.publish("nevoa/"+ str(self.id) + "/hidrometro/"+ str(i) +"/consumo/" + str(key), payload=x_string,retain=True,qos=1)
                         i = i + 1
                 except Exception:
                     pass
@@ -206,7 +206,6 @@ class Nevoa:
             d = {}
             for key, value in self.lista_clientes.items():
                 d[key] = int(value['consumo'])
-
             try:
                 self.lista_ordenada = sorted(d.items(),key= operator.itemgetter(1))
             except Exception:
@@ -230,12 +229,15 @@ def main():
         conectar_na_nuvem = Thread(target=nevoa.executar_conexao_nuvem_brocker)
         conectar_no_brocker = Thread(target=nevoa.executar_conexao_nevoa_brocker)
         ordenar_lista = Thread(target=nevoa.sort_clients_by_consumo)
-    except KeyboardInterrupt:
-        print("Fechando os processos")   
-    finally:
         ordenar_lista.start()
         conectar_no_brocker.start()
         conectar_na_nuvem.start()
+    except KeyboardInterrupt:
+        print("Fechando os processos")   
+    finally:
+        ordenar_lista.join()
+        conectar_no_brocker.join()
+        conectar_na_nuvem.join()
 
 if __name__ == '__main__':
     main()

@@ -1,0 +1,37 @@
+form {
+    background-color: rgb(241, 244, 247);
+    border-radius: 10px;
+    border-width: 2px;
+    border-color: azure;
+    backdrop-filter: blur(10px);
+    backdrop-filter: drop-shadow(4px 4px 10px gray);
+    margin-inline: 40vw;
+    padding-top: 5px;
+    padding-inline: 10px;
+    padding-bottom: 20px;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+    margin-bottom: 5px;
+}
+
+form > input{
+    margin-bottom: 2px;
+}
+.container{
+    padding: 5px;
+    margin-inline: 40vw;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: rgb(223, 226, 226);
+}
+
+.show{
+    margin: 2px;
+    padding-inline: 5px;
+    background-color: rgb(197, 220, 247);
+    border-radius: 10px;
+}
