@@ -31,14 +31,14 @@ A computação em nevoa é uma infraestrutura descentralizada de computação em
 
 <h1>3	Metodologia, Implementação e Testes</h3>
 <p>Dentro das especificações devia-se atender a milhões de requisições de hidrômetros e garantir menor latência para o acesso de dados pelos usuários finais através da API, uma solução centralizada foi descartada visto que concentrar todo processamento em um único servidor iria resultar em sobrecarregar o servidor.</p>
- 
-Figura 1. Arquitetura proposta para o sistema
+<p align="center"><img src ="img/img2.png"></p>
+<p align ="center"><strong>Figura 1. Arquitetura proposta para o sistema</strong></p>
  <p>
 Optou-se por uma arquitetura descentralizada em que o processamento foi distribuído e somente operações que necessitariam de todos dados seriam enviadas em um servidor centralizado. No digrama da arquitetura temos, no primeiro temos os hidrômetros que enviam e recebem dados para a Névoa da sua região( geograficamente definida), no segundo a Névoa realiza o pré-processamento dos dados recebidos e transmite as requisições da Nuvem para os hidrômetros, pôr fim a Nuvem é o processamento centralizado em que são calculadas as médias e listagem de dados par o usuário.</p>
 <p>
 Para o protocolo MQTT foi utilizado o paho-mqtt biblioteca disponível no pyhton junto do Mosquitto brocker. Para aproveitar a futura organização geográfica da cidade onde o sistema será implementado as Nevoas e hidrômetros foram organizados por região e devido a isso optou-se por criar um brocker para cada Nevoa e seus hidrômetros e um único brocker entre a Nuvem e as nevoas.</p>
- 
-Figura 2. Diagrama logico da comunicação MQTT definida.
+<p align="center"><img src ="img/img1.png"></p>
+<p align="center"><strong>Figura 2. Diagrama logico da comunicação MQTT definida.</strong></p>
 <p>
 Foram definidos os seguintes parâmetros quanto a qualidade de serviço para a comunicação, mensagem de envio de dados recebem q0s já que não existem problemas caso ocorra perde de dados, já as operações como bloqueio e alteração de parâmetros recebem qOs 1 pois tem de ser recebidas para não comprometer o sistema.</p>
 <p>
