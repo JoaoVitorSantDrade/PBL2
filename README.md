@@ -47,6 +47,7 @@ A nevoa consistiu dos nós de processamento entre os hidrômetros e a nuvem, for
 Para acesso a aplicação foi criado uma API rest usando o framework Flask no python, a API disponibiliza os métodos para acesso das funcionalidades requisitadas como listar hidrômetros com maior consumo e bloquear um hidrômetro, a nível de implementação uma chamada do tipo Get ou Post é feita o servidor recebe o cabeçalho http e a partir da rota executa a  operação solicitada e se retorna um JSON respondendo a requisição.
 </p>
 <h1> 4 Resultados</h1>
+<p>Para validação do sistema foram realizados experimentos controlados a fim de primeiro validar a comunicação MQTT entre os módulos, verificar o tratamento dos problemas de concorrência e a operação da API rest.</p>
 <h1> 5 Conclusão</h1>
 <h1>Referências</h1>
 
