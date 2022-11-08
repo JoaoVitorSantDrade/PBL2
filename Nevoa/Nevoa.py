@@ -52,6 +52,8 @@ class Nevoa:
         # salvar valor no client especifico
         if topico == "hidrometro/"+id_client+"/consumo":
             consumo = float(msg)
+            if(self.limite_consumo < consumo):
+                self.Client.publish("hidrometro/"+ id_client +"/fechado", 1) # Fecha o hidrometro caso o consumo passe do limite
             self.lista_clientes[id_client].update({"consumo":consumo})
 
         elif topico == "hidrometro/"+id_client+"/vazao":

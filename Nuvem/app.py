@@ -227,7 +227,6 @@ def api_hid():
                     global pos_fila
                     fila_de_comandos[pos_fila].update({"ID":id,"ID_hid":id_hid,"bloqueio":bloqueio})
                     pos_fila = pos_fila + 1
-                    print(fila_de_comandos)
                     return "Comando colocado na fila com sucesso"
             except Exception:
                     return "Não foi possivel colocar o comando na fila"
@@ -240,7 +239,6 @@ def api_hid():
                         id_hid = int(args['id_hid'])
                         fila_de_comandos[pos_fila].update({"ID":id,"ID_hid":id_hid,"tendencia":tendencia})
                         pos_fila = pos_fila + 1
-                        print(fila_de_comandos)
                         return "Comando colocado na fila com sucesso"
                 except Exception:
                         return "Não foi possivel colocar o comando na fila"
@@ -253,7 +251,6 @@ def api_hid():
                         id_hid = int(args['id_hid'])
                         fila_de_comandos[pos_fila].update({"ID":id,"ID_hid":id_hid,"delay":delay})
                         pos_fila = pos_fila + 1
-                        print(fila_de_comandos)
                         return "Comando colocado na fila com sucesso"
                 except Exception:
                         return "Não foi possivel colocar o comando na fila"
@@ -278,7 +275,7 @@ def api_nevoa():
 
     args = request.args
     args = args.to_dict()
-
+    
     if "limite" in args:
         if args["limite"] != "":
             limite = int(args["limite"])
@@ -288,7 +285,6 @@ def api_nevoa():
                     id = int(args["id"])
                     fila_de_comandos[pos_fila].update({"ID":id,"limite":limite})
                     pos_fila = pos_fila + 1
-                    print(fila_de_comandos)
                     return "Comando colocado na fila com sucesso"
             except Exception:
                 return "Não foi possivel colocar o comando na fila"
@@ -297,11 +293,9 @@ def api_nevoa():
         if args["delay"] != "":
             delay = int(args["delay"])
             try:
-                if "id" in args:
                     id = int(args['id'])
                     fila_de_comandos[pos_fila].update({"ID":id,"delay":delay})
                     pos_fila = pos_fila + 1
-                    print(fila_de_comandos)
                     return "Comando colocado na fila com sucesso"
             except Exception:
                     return "Não foi possivel colocar o comando na fila"
@@ -309,9 +303,9 @@ def api_nevoa():
         js = defaultdict(dict)
         i = 0
         try:
-            for key in lista_nevoa.items():
+            for key, value in lista_nevoa.items():
                 x = {
-                    "ID": key,
+                    "Nevoa_ID": key,
                 } 
                 js[str(i)].update(x)
                 i = i + 1
