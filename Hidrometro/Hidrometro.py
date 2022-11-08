@@ -72,6 +72,11 @@ class Hidrometro:
             self.hidrante.delay = int(msg)
             print("Mensagem recebida no topico 'delay'")
 
+        elif topico == "hidrometro/"+ str(self.hidrante.id) + "/tendencia":
+            self.hidrante.tendencia = int(msg)
+            print("Mensagem recebida no topico 'tendencia'")
+
+
     def on_connect(self,client, userdata, flags, rc):
         print("Connected with result code "+str(rc))
 

@@ -174,6 +174,7 @@ class Nevoa:
 
                 if i > 0:
                     media = media/i
+                    print("Media enviada")
                     self.Client_Nuvem.publish("nevoa/" + str(self.id) + "/media", media, retain=True)
 
                 try:
