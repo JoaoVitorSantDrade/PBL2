@@ -1,5 +1,3 @@
-from shutil import ExecError
-from threading import local
 from threading import Thread
 import Hidrante as Hidrante
 from threading import Thread
@@ -7,7 +5,6 @@ import time
 import os
 from time import localtime, strftime
 import paho.mqtt.client as mqtt
-import paho.mqtt.publish as publish
 
 class Hidrometro:
     

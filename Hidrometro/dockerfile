@@ -1,0 +1,8 @@
+FROM python:3.10.5
+
+RUN pip install paho-mqtt
+
+ADD Hidrante.py .
+ADD Hidrometro.py .
+
+CMD ["python","./Hidrometro.py"]

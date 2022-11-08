@@ -1,9 +1,6 @@
 from flask import Flask, request
 import paho.mqtt.client as mqtt
 from random import randint
-import paho.mqtt.client as mqtt
-import paho.mqtt.publish as publish
-import config_nuvem
 from collections import defaultdict
 import os
 import operator

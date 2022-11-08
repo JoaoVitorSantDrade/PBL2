@@ -1,7 +1,5 @@
 from numpy import Infinity
 import paho.mqtt.client as mqtt
-import paho.mqtt.publish as publish
-from random import seed
 from threading import Thread
 from random import randint
 import time
