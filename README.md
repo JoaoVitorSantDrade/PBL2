@@ -62,3 +62,36 @@ Para acesso a aplicação foi criado uma API rest usando o framework Flask no py
 <p>Gaidargi Juliana. O que é computação em névoa? [2022] Disponível em: < https://www.infonova.com.br/cloud/o-que-e-computacao-em-nevoa//> Acesso em: 03 Nov. 2022.</p>
 
 <h1> Para executar o programa </h1>
+Todos os dockerfiles podem ser executados utilizando o comando:
+
+docker run -it --name=coisa  jvsandrade/pbl2_#nevoa/hidrometro
+
+com exceção da Nuvem:
+
+docker run -it -p 5000:5000 jvsandrade/pbl2_nuvem
+
+e do brocker:
+
+docker run -it -p Definir:Definir jvsandrade/pbl2_brocker
+
+
+Quando iniciar o brocker, executar o comando sudo apt get install nano, a senha é docker
+
+depois dê um "cd etc" e um "cd mosquitto"
+
+edite o arquivo utilizando "sudo nano mosquitto.conf"
+
+adicione isso no arquivo:
+
+listener Definir (digite a porta que definiu na imagem acima)
+persistence false
+allow_anonymous true
+
+salve o arquivo utilizando o ctrl + x
+
+volte pro diretorio anterior (cd ..)
+
+rode "mosquitto -v -c mosquitto/mosquitto.conf"
+
+seu brocker está aberto
+
