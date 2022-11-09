@@ -48,9 +48,17 @@ Para acesso a aplicação foi criado uma API rest usando o framework Flask no py
 </p>
 <h1> 4 Resultados</h1>
 <p>Para validação do sistema foram realizados experimentos controlados a fim de primeiro validar a comunicação MQTT entre os módulos, verificar o tratamento dos problemas de concorrência e a operação da API rest.</p>
+<p>Foram criadas três classes para implementar o sistema, o hidrômetro gerando os dados de modo aleatório a partir da tendência e enviando seus dados para o brocker da nevoa, a nevoa aglomera as informações dos hidrômetros  e se comunica com a única nuvem instanciada.</p>
+<p>Na nuvem os dados são centralizados e a API acessa os serviços a partir da nuvem que mesmo centralizada pode ser acessada por qualquer interface estando independente dos demais módulos.</p>
 <h1> 5 Conclusão</h1>
+<p>A solução proposta foi implementada e funcionou corretamente, visando atender os requisitos de baixa latência  o paradigma de computação em névoa foi utilizado junto a processamento distribuido, com isso pode-se trabalhar com uma situação próxima da realidade em um sistema de grande porte para atender milhões de requisições e poder construir uma arquitetura para atender aos requisitos com base nas soluções já apresentadas nas produções acadêmicas.</p>
+<p>Com o uso dos protocolos MQTT e Rest pode-se explorar mais protocolos da camada de aplicação e construir arquiteturas de aplicação baseadas neles e visualizar os benefícios e restrições de seu uso como no caso da API Rest aplicada para o acesso normatizado dos serviços da aplicação. </p>
 <h1>Referências</h1>
 
 <p>ROSS, Keith W.; KUROSE, James F. Redes de Computadores e a Internet: Uma abordagem top-down. São, 2006.</p>
 <p>RedHat. API REST. [2020]. Disponível em: <https://www.redhat.com/pt-br/topics/api/what-is-a-rest-api> Acesso em: 03 Nov. 2022.</p>
 <p>DevMedia. Rest tutorial. [2013]. Disponível em: < https://www.devmedia.com.br/rest-tutorial/28912> Acesso em: 03 Nov. 2022.</p>
+<p>UFRJ. MQTT. [2019] Disponível em: < https://www.gta.ufrj.br/ensino/eel878/redes1-2019-1/vf/mqtt/> Acesso em: 03 Nov. 2022.</p>
+<p>Gaidargi Juliana. O que é computação em névoa? [2022] Disponível em: < https://www.infonova.com.br/cloud/o-que-e-computacao-em-nevoa//> Acesso em: 03 Nov. 2022.</p>
+
+<h1> Para executar o programa </h1>
